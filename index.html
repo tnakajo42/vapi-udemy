@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build an AI Voice Agent for Web & Phone with Vapi + Twilio (Course Material)</title>
+
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --card:#111826;
+      --text:#e6edf3;
+      --muted:#9fb0c0;
+      --link:#77bdfb;
+      --border:#233244;
+      --codebg:#0a1220;
+      --accent:#3fb950;
+      --warn:#f0b429;
+      --danger:#f85149;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #070a0e 60%);
+      color:var(--text);
+      line-height:1.75;
+    }
+    .container{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+    header{
+      background: rgba(17,24,38,.7);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(6px);
+    }
+    header h1{
+      margin:0 0 6px;
+      font-size: 22px;
+      line-height:1.35;
+    }
+    header .meta{
+      color:var(--muted);
+      font-size: 13px;
+    }
+    .badge{
+      display:inline-block;
+      font-size:12px;
+      padding:3px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(63,185,80,.10);
+      color: #b7f7c5;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .note{
+      border:1px solid var(--border);
+      background: rgba(17,24,38,.6);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 16px 0;
+      color: var(--muted);
+    }
+    .note strong{color:var(--text)}
+    .warn{ border-left: 4px solid var(--warn); padding-left: 12px; }
+    .danger{ border-left: 4px solid var(--danger); padding-left: 12px; }
+
+    main{
+      background: rgba(17,24,38,.45);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+    }
+    h2,h3,h4{ line-height:1.3; margin: 22px 0 10px; }
+    h2{ font-size: 20px; border-bottom:1px solid rgba(35,50,68,.7); padding-bottom:6px }
+    h3{ font-size: 17px }
+    h4{ font-size: 15px; color: #dbe7f3 }
+    p{ margin: 10px 0 }
+    a{ color:var(--link); text-decoration:none }
+    a:hover{ text-decoration: underline }
+    ul,ol{ margin: 8px 0 12px 22px }
+    li{ margin: 4px 0 }
+    code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Sans Mono", "Courier New", monospace;
+      background: rgba(10,18,32,.65);
+      border: 1px solid rgba(35,50,68,.6);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #d4e2f1;
+      font-size: .95em;
+    }
+    pre{
+      background: rgba(10,18,32,.85);
+      border:1px solid rgba(35,50,68,.85);
+      border-radius: 12px;
+      padding: 12px 12px;
+      overflow:auto;
+      margin: 10px 0 14px;
+    }
+    pre code{
+      background: transparent;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      color: #d4e2f1;
+      font-size: 13px;
+      white-space: pre;
+    }
+    figure{
+      margin: 14px 0;
+      padding: 12px;
+      background: rgba(10,18,32,.35);
+      border:1px solid rgba(35,50,68,.7);
+      border-radius: 12px;
+    }
+    figure img{
+      width:100%;
+      height:auto;
+      border-radius: 10px;
+      border:1px solid rgba(35,50,68,.7);
+      display:block;
+    }
+    figcaption{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .hr{
+      height:1px;
+      background: rgba(35,50,68,.8);
+      margin: 18px 0;
+    }
+    footer{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 14px;
+      text-align:center;
+    }
+    .kicker{ color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .callout{
+      border:1px solid var(--border);
+      background: rgba(17,24,38,.6);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 14px 0;
+    }
+
+    /* ========== Official widget (fixed bottom-right) ========== */
+    .vapi-official-right {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2147483646;
+    }
+
+    /* ========== Custom green button (html-script-tag) fixed bottom-left ========== */
+    /* DOM examples:
+       <button id="vapi-support-btn" ...>
+         <div id="vapi-icon-container">...</div>
+       </button>
+    */
+    #vapi-support-btn{
+      position: fixed !important;
+      left: 18px !important;
+      bottom: 18px !important;
+      right: auto !important;
+      top: auto !important;
+      transform: none !important;
+      inset: auto !important;
+      margin: 0 !important;
+      z-index: 2147483647 !important;
+    }
+    #vapi-icon-container{
+      position: static !important; /* keep inside the button */
+      transform: none !important;
+    }
+
+    /* Safe-area support (iOS) */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      #vapi-support-btn{
+        bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+        left: calc(18px + env(safe-area-inset-left)) !important;
+      }
+      .vapi-official-right{
+        bottom: calc(18px + env(safe-area-inset-bottom));
+        right: calc(18px + env(safe-area-inset-right));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="meta">
+        <span class="badge">Udemy Course Material</span>
+        Use this page as a reference while watching the lectures.
+      </div>
+      <h1>Build an AI Voice Agent for Web & Phone with Vapi + Twilio</h1>
+      <div class="kicker">
+        Vapi: <a href="https://vapi.ai/" target="_blank" rel="noopener">https://vapi.ai/</a>
+      </div>
+    </header>
+
+    <main>
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/vapi-top.png?raw=1" alt="Vapi top screen" />
+        <figcaption>Vapi — Top screen</figcaption>
+      </figure>
+
+      <p>
+        On the Vapi website, click <strong>“TALK TO VAPI”</strong>. It may start in English, but you can say
+        “Please speak Japanese” (or any language you want) and it will switch.
+      </p>
+
+      <h2>Introduction</h2>
+
+      <p>
+        In this course, you’ll build a real <strong>Voice User Interface (VUI)</strong>—the next user interface after mobile—
+        and ship a working prototype that runs on both <strong>your website</strong> and a <strong>real phone number</strong>.
+      </p>
+
+      <p>
+        You’ve probably seen “Ask AI” buttons on websites. But typing can be annoying. A voice experience feels far more natural:
+        you speak, the AI answers—instantly.
+      </p>
+
+      <p>
+        We’ll start simple, then move into production-style integration with Twilio.
+      </p>
+
+      <div class="callout">
+        <p><strong>Experience Goal (Nakajo AI Demo Video):</strong>
+          <a href="https://youtube.com/shorts/eel44_lUL4E" target="_blank" rel="noopener">https://youtube.com/shorts/eel44_lUL4E</a>
+        </p>
+        <p><strong>Nakajo AI (phone demo):</strong> +1 (640) 227-4161</p>
+      </div>
+
+      <h2>Vapi × Twilio — “Let AI Answer Your Phone Calls”</h2>
+
+      <p>Twilio:
+        <a href="https://www.twilio.com/" target="_blank" rel="noopener">https://www.twilio.com/</a>
+      </p>
+
+      <h3>Step 1 — Twilio setup</h3>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/twilio-dashboard.png?raw=1" alt="Twilio dashboard" />
+        <figcaption>Twilio Dashboard</figcaption>
+      </figure>
+
+      <p>First, get a phone number in Twilio with free credits.</p>
+      <p>Then find your <strong>Account SID</strong> and <strong>Auth Token</strong>.</p>
+      <p>Tip: A US number (+1) is fine for this course.</p>
+
+      <p>
+        On the bottom of
+        <a href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio Console</a>,
+        you’ll see “Account Info” lower on the page.
+      </p>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/Twilio-account-info.png?raw=1" alt="Twilio account info" />
+        <figcaption>Twilio Account Info</figcaption>
+      </figure>
+
+      <h3>Step 2 — Vapi setup (import your Twilio number)</h3>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/vapi-dashboard.png?raw=1" alt="Vapi dashboard" />
+        <figcaption>Vapi Dashboard</figcaption>
+      </figure>
+
+      <ol>
+        <li>Log in to Vapi dashboard</li>
+        <li>Left menu → <strong>Phone Numbers</strong> → <strong>Import</strong></li>
+        <li>Fill the form and click <strong>Import</strong></li>
+      </ol>
+      <ul>
+        <li>Phone number (your Twilio number)</li>
+        <li>Twilio Account SID</li>
+        <li>Twilio Auth Token</li>
+      </ul>
+
+      <p>Set a label like “Udemy” or “Demo”.</p>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/vapi-auth-setting.png?raw=1" alt="Vapi import settings" />
+        <figcaption>Vapi Import Settings</figcaption>
+      </figure>
+
+      <p>Once imported, the number will appear in Vapi.</p>
+
+      <h4>Choose which assistant answers inbound calls</h4>
+      <ol>
+        <li>Click the imported phone number</li>
+        <li>In <strong>Inbound Settings</strong>, select your Assistant (example: “Riley”)</li>
+        <li>Save</li>
+      </ol>
+
+      <p>This sets the rule: “When a call comes to this number, launch this Assistant.”</p>
+
+      <div class="note warn">
+        <p><strong>Optional features (good to know)</strong></p>
+        <p><strong>Squad</strong>: Group multiple assistants and route calls between them.</p>
+        <p><strong>Workflow</strong>: Build a custom call flow (office hours, IVR, SMS, etc.).</p>
+        <p><strong>Fallback Destination</strong>: Forward calls if AI can’t answer.</p>
+      </div>
+
+      <h4>Customize your assistant</h4>
+
+      <p>
+        You can create a new assistant from <strong>Assistants → Create Assistant</strong>,
+        or customize an existing one.
+      </p>
+
+      <p>
+        Here is an example configuration used in <strong>Nakajo AI</strong> (demo).
+      </p>
+
+      <p><strong>First Message:</strong></p>
+      <pre><code class="language-text">Hi! This is Nakajo AI. Thanks for calling—how can I help you today?</code></pre>
+
+      <p><strong>System Prompt (example):</strong></p>
+      <pre><code class="language-text">[Identity]
+You are "Nakajo AI", a friendly teaching assistant helping students learn how to build Vapi + Twilio voice agents.
+
+[Style]
+- Speak clearly and calmly.
+- Use simple explanations and avoid unnecessary jargon.
+- When the user seems stuck, ask a short clarifying question.
+- Keep responses concise and practical.
+
+[Goals]
+1) Help learners complete each step successfully.
+2) Provide troubleshooting guidance when errors occur.
+3) Encourage experimentation with prompts, voices, and deployment.
+
+[Safety / Fallback]
+- If you are not sure, say so and suggest a next check.
+- Do not be rude or overly confident.
+</code></pre>
+
+      <p class="note">
+        <strong>Note:</strong> The “No Structured Outputs Configured” warning can be ignored. It does not affect calls.
+      </p>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/no-structured.png?raw=1" alt="No structured outputs configured" />
+        <figcaption>No Structured Outputs Configured (safe to ignore)</figcaption>
+      </figure>
+
+      <p>
+        You can also add reference documents in the <strong>Files</strong> section to make your assistant behave like a TA.
+      </p>
+
+      <p>
+        Model note (time-sensitive): choose a fast model for real-time calls whenever possible.
+      </p>
+
+      <h4>Enable Japanese (or any language) for transcription</h4>
+
+      <p>
+        If your default is English, set the <strong>Transcriber language</strong> to Japanese (or your target language),
+        otherwise recognition may be poor.
+      </p>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/vapi-toJapanese.png?raw=1" alt="Set transcriber language" />
+        <figcaption>Set Transcriber Language</figcaption>
+      </figure>
+
+      <h3>Step 3 — Point Twilio inbound calls to Vapi</h3>
+
+      <p>
+        If you don’t configure Twilio’s inbound webhook, nothing will happen when you call your number.
+      </p>
+
+      <ol>
+        <li>In <a href="https://console.twilio.com/" target="_blank" rel="noopener">Twilio Console</a> go to:
+          <strong>Develop → Phone Numbers → Manage → Active Numbers</strong>
+        </li>
+        <li>Click your phone number</li>
+        <li>In <strong>Voice Configuration</strong>, set “A call comes in” to <strong>Webhook</strong></li>
+        <li>Set the URL to: <code>https://api.vapi.ai/twilio/inbound_call</code></li>
+      </ol>
+
+      <p>Now call your number. If the AI answers, you’re done.</p>
+
+      <p class="note warn">
+        Twilio trial accounts have limitations. For real usage, you may need to upgrade.
+      </p>
+
+      <h2>Talk to your AI (Web)</h2>
+
+      <p>
+        Use the voice widget(s) on this page to test your assistant in the browser.
+        If it works, your web integration is good.
+      </p>
+
+      <h2>Advanced: Troubleshoot Twilio trial issues</h2>
+
+      <p>
+        If you hear a “Trial” error, open Twilio’s call logs to identify the reason.
+      </p>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/twilio-failed.png?raw=1" alt="Twilio call log" />
+        <figcaption>Check the Calls Log for failure reasons</figcaption>
+      </figure>
+
+      <h3>Upgrade notes (Twilio)</h3>
+      <p>
+        Trial accounts can block some destinations to prevent abuse. If needed, upgrade your account,
+        then remove payment methods afterward (optional).
+      </p>
+
+      <figure>
+        <img src="https://github.com/protoout/fukui-day4-5/blob/main/day4/img/no-payment-settings.png?raw=1" alt="No payment settings" />
+        <figcaption>Payment methods removed (example)</figcaption>
+      </figure>
+
+      <div class="hr"></div>
+
+      <h2>References</h2>
+      <ul>
+        <li>Vapi Docs: Twilio SIP Trunk:
+          <a href="https://docs.vapi.ai/advanced/sip/twilio" target="_blank" rel="noopener">https://docs.vapi.ai/advanced/sip/twilio</a>
+        </li>
+        <li>Case study / article:
+          <a href="https://developers.cyberagent.co.jp/blog/archives/60442/" target="_blank" rel="noopener">https://developers.cyberagent.co.jp/blog/archives/60442/</a>
+        </li>
+      </ul>
+    </main>
+
+    <footer>
+      © 2026 Udemy Course Material — Vapi + Twilio
+    </footer>
+  </div>
+
+  <div class="vapi-official-right">
+    <vapi-widget id="vapi-widget" mode="voice" size="compact"></vapi-widget>
+  </div>
+
+  <!-- Load order matters: settings -> script -->
+  <script src="./settings.js"></script>
+  <script src="./script.js"></script>
+
+  <!-- Official widget library -->
+  <script
+    src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
+    async
+    type="text/javascript"
+  ></script>
+</html>
