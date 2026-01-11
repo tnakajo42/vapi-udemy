@@ -1,2 +1,2 @@
-const VAPI_PUBLIC_KEY = "12638e18-21dd-49a1-9b26-ba1ec876c05a";
-const VAPI_ASSISTANT_ID = "6d487065-80df-4178-9429-a3a9c9de5bfb";
+const VAPI_PUBLIC_KEY = "****************";
+const VAPI_ASSISTANT_ID = "****************";
