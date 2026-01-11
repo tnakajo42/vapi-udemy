@@ -2,7 +2,6 @@
   const PUBLIC_KEY = typeof VAPI_PUBLIC_KEY !== "undefined" ? VAPI_PUBLIC_KEY : null;
   const ASSISTANT_ID = typeof VAPI_ASSISTANT_ID !== "undefined" ? VAPI_ASSISTANT_ID : null;
 
-
   if (!PUBLIC_KEY || !ASSISTANT_ID) {
     console.error("[Vapi] Missing keys. Check settings.js");
     return;
